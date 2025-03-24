@@ -29,6 +29,70 @@ const oraichain = {
         ORAI,
     ),
 
+    buildSendPayload: async ({
+        from: address,
+        to,
+        amount,
+        denom = ORAI,
+    }: {
+        from: string;
+        to: string;
+        amount: string;
+        denom?: string;
+    }) => {
+        const cosmosUtils = oraichain.cosmosUtils;
+        cosmosUtils.withSenderAddress(address);
+        const signDoc = await cosmosUtils.buildSimpleMsgSendStdSignDoc(
+            to,
+            amount,
+            denom,
+        );
+        const rawMsg = serializeSignDoc(signDoc);
+        const { msgHash, payload } =
+            oraichain.cosmosUtils.buildCosmosPayload(rawMsg);
+        return { msgHash, payload };
+    },
+
+    buildSendPayloadDirect: async ({
+        from: address,
+        to = address,
+        amount,
+        publicKey,
+        denom = ORAI,
+    }: {
+        from: string;
+        to: string;
+        amount: string;
+        publicKey: string;
+        denom?: string;
+    }) => {
+        if (!address) {
+            console.log('must provide a sending address');
+            return Uint8Array.from([]);
+        }
+        console.log(
+            'sending',
+            amount,
+            oraichain.cosmosUtils.denom.toUpperCase(),
+            'from',
+            address,
+            'to',
+            to,
+        );
+        const compressedPublicKey = compressPublicKey(publicKey);
+        const cosmosUtils = oraichain.cosmosUtils;
+        cosmosUtils.withSenderAddress(address);
+        const signDoc = await cosmosUtils.buildSimpleMsgSendSignDocDirect(
+            to,
+            amount,
+            compressedPublicKey,
+            denom,
+        );
+        const rawMsg = makeSignBytes(signDoc);
+        const { payload } = cosmosUtils.buildCosmosPayload(rawMsg);
+        return payload;
+    },
+
     send: async ({ from: address, to = address, amount }) => {
         if (!address) return console.log('must provide a sending address');
         console.log(

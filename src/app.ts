@@ -23,6 +23,7 @@ program
     .option('-etx')
     .option('-otx')
     .option('-oetx')
+    .option('-otxpl')
     .option('-btx')
     .option('-dtx')
     .option('-rtx')
@@ -82,6 +83,7 @@ let {
     rtx,
     otx,
     oetx,
+    otxpl,
     edc,
     view,
     call,
@@ -181,6 +183,17 @@ async function main() {
         const { address } = await genAddress('cosmos-ethermint');
         console.log(address);
         await oraichainEthermint.send({ from: address, to, amount });
+    }
+    if (otxpl) {
+        const { address, publicKey } = await genAddress('cosmos');
+        console.log(address);
+        const payload = await oraichain.buildSendPayloadDirect({
+            from: address,
+            to,
+            publicKey,
+            amount,
+        });
+        console.log('payload: ', Buffer.from(payload).toString('hex'));
     }
 
     // contract deployment and interaction
