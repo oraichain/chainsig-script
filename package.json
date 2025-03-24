@@ -8,7 +8,7 @@
         "format": "prettier --write ."
     },
     "devDependencies": {
-        "@cosmjs/amino": "^0.31.3",
+        "@cosmjs/amino": "^0.32.4",
         "@cosmjs/encoding": "^0.32.4",
         "@cosmjs/math": "^0.32.4",
         "@cosmjs/proto-signing": "^0.32.4",
